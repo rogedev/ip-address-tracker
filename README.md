@@ -1,5 +1,13 @@
 # ip-address-tracker
 
+## Project preview
+<img src="https://github.com/rogedev/ip-address-tracker/blob/main/src/assets/preview.png"/>
+
+### CLone this project
+```
+git clone https://github.com/rogedev/ip-address-tracker.git
+```
+
 ## Project setup
 ```
 npm install
