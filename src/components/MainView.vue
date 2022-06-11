@@ -17,12 +17,34 @@
           | {{ item.title }}
         .main__text
           | {{ item.value }}
-    .map
+  .map-section
+    l-map.map(
+      v-model="zoom",
+      v-model:zoom="zoom",
+      :center="cords",
+      :min-zoom="3",
+      :options="{ zoomControl: false }",
+      @update:zoom="zoomUpdated",
+      @update:center="centerUpdated",
+      @update:bounds="boundsUpdated"
+    )
+      l-tile-layer(url="http://{s}.tile.osm.org/{z}/{x}/{y}.png")
+      l-marker(:lat-lng="cords")
+        l-tooltip
+          | {{ tooltip }}
 </template>
 
 <script>
+import { LMap, LTileLayer, LMarker, LTooltip } from "@vue-leaflet/vue-leaflet"
+
 export default {
   name: 'MainView',
+  components: {
+    LMap,
+    LTileLayer,
+    LMarker,
+    LTooltip
+  },
   props: {
     message: String,
   },
@@ -30,33 +52,70 @@ export default {
     return {
       ip: null,
       detail: {
-        ip: { title: 'IP ADRESS', value: '-' },
-        location: { title: 'LOCATION', value: '-' },
-        timezone: { title: 'TIMEZONE', value: '-' },
-        isp: { title: 'ISP', value: '-' },
-      }
-
+        ip: {
+          title: 'IP ADRESS',
+          value: '-'
+        },
+        location: {
+          title: 'LOCATION',
+          value: '-'
+        },
+        timezone: {
+          title: 'TIMEZONE',
+          value: '-'
+        },
+        isp: {
+          title: 'ISP',
+          value: '-'
+        },
+      },
+      zoom: 10,
+      cords: [25.54384799152488, -103.52998458496477],
+      bounds: null,
+      tooltip: 'Lerdo, Durango, MX',
+      error: false
     }
   },
+
   methods: {
     search() {
-
-      fetch(`https://geo.ipify.org/api/v2/country?apiKey=${process.env.VUE_APP_API_KEY}&ipAddress=${this.ip}`)
-        .then(response => response.json())
-        .then((data) => {
-          if (data) {
-            this.detail.ip.value = data.ip ?? '-'
-            this.detail.location.value = `${data.location.region}, ${data.location.country}` ?? '-'
-            this.detail.timezone.value = data.location.timezone ?? '-'
-            this.detail.isp.value = data.isp ?? '-'
-          }
-        })
-        .catch(error => console.log(error))
+      if (!this.ip) {
+        alert('Invalid IP')
+        this.ip = null
+      } else {
+        fetch(`https://geo.ipify.org/api/v2/country,city?apiKey=${process.env.VUE_APP_API_KEY}&ipAddress=${this.ip}`)
+          .then(response => response.json())
+          .then((data) => {
+            if (data.location != undefined) {
+              this.detail.ip.value = data.ip
+              this.detail.location.value = `${data.location.city}, ${data.location.region}, ${data.location.country}`
+              this.detail.timezone.value = data.location.timezone
+              this.detail.isp.value = data.isp
+              this.cords = [data.location.lat, data.location.lng]
+              this.tooltip = this.detail.location.value
+            }
+            else {
+              alert('IP not found')
+              this.ip = null
+            }
+          })
+          .catch((error) => console.log(error))
+      }
     },
+    zoomUpdated(zoom) {
+      this.zoom = zoom
+    },
+    centerUpdated(center) {
+      this.center = center
+    },
+    boundsUpdated(bounds) {
+      this.bounds = bounds
+    }
   },
 }
 </script>
 <style>
+@import "leaflet/dist/leaflet.css";
 @import url("https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700&display=swap");
 
 @media screen and (min-width: 200px) {
@@ -87,9 +146,11 @@ export default {
     margin: 1em;
     z-index: 99;
     text-align: center;
+    justify-content: center;
   }
 
   .main__title {
+    justify-self: center;
     color: #fff;
     font-size: 1.5em;
     font-weight: 500;
@@ -152,8 +213,10 @@ export default {
     font-size: 18px;
   }
 
-  .map {
+  .map-section {
     height: calc(100vh - 250px);
+  }
+  .map {
     z-index: 1;
   }
 }
