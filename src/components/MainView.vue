@@ -54,7 +54,7 @@ export default {
       ip: null,
       detail: {
         ip: {
-          title: 'IP ADRESS',
+          title: 'IP ADDRESS',
           value: '-'
         },
         location: {
