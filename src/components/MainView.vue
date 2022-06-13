@@ -23,6 +23,7 @@
       v-model:zoom="zoom",
       :center="cords",
       :min-zoom="3",
+      :max-zoom="19",
       :options="{ zoomControl: false }",
       @update:zoom="zoomUpdated",
       @update:center="centerUpdated",
