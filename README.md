@@ -3,7 +3,7 @@
 ## Project preview
 <img src="https://github.com/rogedev/ip-address-tracker/blob/main/src/assets/preview.png"/>
 
-### CLone this project
+### Clone this project
 ```
 git clone https://github.com/rogedev/ip-address-tracker.git
 ```
@@ -28,9 +28,9 @@ npm run build
 npm run lint
 ```
 
-### Setup Api key
+### ENV FILE
 
-setup a .env file whith VUE_APP_API_KEY=your_api_key
+VUE_APP_API_KEY=your_api_key
 
 Get your Api key [here](https://geo.ipify.org/).
 
